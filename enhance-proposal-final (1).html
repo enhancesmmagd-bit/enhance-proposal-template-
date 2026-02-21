@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Enhance Marketing Agency — Proposal</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --black:  #0a0a0a;
+    --gold:   #D4A843;
+    --gold-lt:#F0C96A;
+    --gold-dk:#A07828;
+    --white:  #ffffff;
+    --off:    #F9F6F0;
+    --light:  #EDE8E0;
+    --gray:   #6B6B6B;
+    --charcoal:#1C1C1C;
+  }
+  html { scroll-behavior: smooth; }
+  body { background: var(--off); color: var(--black); font-family: 'DM Sans', sans-serif; font-weight: 300; }
+
+  /* EDIT MODE TOGGLE */
+  .toolbar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+    background: var(--charcoal); padding: 0.6rem 2rem;
+    display: flex; align-items: center; justify-content: space-between;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+  }
+  .toolbar-left { display: flex; align-items: center; gap: 1rem; }
+  .toolbar-brand { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 0.75rem; letter-spacing: 0.18em; color: var(--gold); }
+  .toolbar-status { font-size: 0.62rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255,255,255,0.4); }
+  .toolbar-right { display: flex; gap: 0.6rem; align-items: center; }
+
+  .btn {
+    padding: 0.42rem 1rem; border-radius: 6px; font-size: 0.65rem;
+    letter-spacing: 0.12em; text-transform: uppercase; font-weight: 700;
+    cursor: pointer; border: none; font-family: 'Montserrat', sans-serif;
+    transition: all 0.2s;
+  }
+  .btn-edit { background: var(--gold); color: var(--black); }
+  .btn-edit:hover { background: var(--gold-lt); }
+  .btn-edit.active { background: #4caf82; color: white; }
+  .btn-print { background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); }
+  .btn-print:hover { background: rgba(255,255,255,0.2); }
+
+  .edit-hint {
+    display: none; position: fixed; bottom: 1.5rem; right: 1.5rem;
+    background: var(--charcoal); color: var(--gold); padding: 0.6rem 1rem;
+    border-radius: 8px; font-size: 0.62rem; letter-spacing: 0.12em;
+    text-transform: uppercase; font-weight: 600; font-family: 'Montserrat', sans-serif;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3); z-index: 100;
+    border: 1px solid rgba(212,168,67,0.3);
+  }
+  .edit-hint.show { display: block; }
+
+  /* Editable field styling */
+  body.editing [contenteditable] {
+    outline: none; border-bottom: 1.5px dashed rgba(212,168,67,0.5);
+    cursor: text; border-radius: 2px;
+    transition: background 0.15s;
+  }
+  body.editing [contenteditable]:hover { background: rgba(212,168,67,0.06); }
+  body.editing [contenteditable]:focus { background: rgba(212,168,67,0.1); border-bottom-color: var(--gold); }
+
+  /* PROPOSAL WRAPPER */
+  .proposal { max-width: 860px; margin: 0 auto; padding-top: 3.5rem; }
+
+  /* COVER PAGE */
+  .cover {
+    background: var(--black); min-height: 100vh; display: flex;
+    flex-direction: column; justify-content: space-between;
+    padding: 4rem; position: relative; overflow: hidden;
+  }
+  .cover::before {
+    content: ''; position: absolute; top: -100px; right: -100px;
+    width: 500px; height: 500px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(212,168,67,0.1) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .cover::after {
+    content: 'ENHANCE'; position: absolute; bottom: -60px; right: -30px;
+    font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 22vw;
+    color: rgba(212,168,67,0.03); pointer-events: none; line-height: 1;
+    letter-spacing: -0.02em; user-select: none;
+  }
+  .cover-logo { position: relative; z-index: 2; }
+  .cl-enhance { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1.1rem; letter-spacing: 0.2em; color: var(--gold); }
+  .cl-sub { font-size: 0.55rem; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(255,255,255,0.3); margin-top: 0.2rem; }
+
+  .cover-main { position: relative; z-index: 2; }
+  .cover-label { font-size: 0.62rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--gold); margin-bottom: 1.5rem; opacity: 0.7; }
+  .cover-title { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: clamp(2.5rem, 6vw, 4.5rem); color: var(--white); line-height: 1; letter-spacing: -0.01em; margin-bottom: 0.5rem; }
+  .cover-title span { color: var(--gold); }
+  .cover-subtitle { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.2rem; color: rgba(255,255,255,0.5); margin-bottom: 2.5rem; }
+  .cover-meta { display: flex; gap: 3rem; }
+  .cm-item { }
+  .cm-label { font-size: 0.55rem; letter-spacing: 0.25em; text-transform: uppercase; color: rgba(255,255,255,0.3); margin-bottom: 0.3rem; }
+  .cm-value { font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: 0.82rem; color: var(--white); letter-spacing: 0.05em; }
+
+  .cover-footer { position: relative; z-index: 2; display: flex; justify-content: space-between; align-items: flex-end; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 1.5rem; }
+  .cf-prepared { font-size: 0.62rem; color: rgba(255,255,255,0.3); line-height: 1.6; }
+  .cf-page { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 0.7rem; color: rgba(255,255,255,0.15); letter-spacing: 0.15em; }
+
+  /* SECTION PAGES */
+  .page {
+    background: var(--white); margin: 0; padding: 4rem;
+    border-top: 1px solid var(--light); position: relative;
+  }
+  .page.dark { background: var(--black); }
+  .page.warm { background: var(--off); }
+  .page-num {
+    position: absolute; top: 2rem; right: 2.5rem;
+    font-family: 'Montserrat', sans-serif; font-weight: 700;
+    font-size: 0.6rem; letter-spacing: 0.2em; color: var(--light);
+  }
+  .page.dark .page-num { color: rgba(255,255,255,0.1); }
+
+  .section-eyebrow { font-size: 0.6rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.8rem; font-family: 'Montserrat', sans-serif; font-weight: 600; }
+  .section-heading { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: clamp(1.8rem, 3.5vw, 2.6rem); line-height: 1.05; color: var(--black); margin-bottom: 1rem; }
+  .section-heading span { color: var(--gold); }
+  .page.dark .section-heading { color: var(--white); }
+  .section-body { font-size: 0.88rem; color: var(--gray); line-height: 1.85; max-width: 580px; }
+  .page.dark .section-body { color: rgba(255,255,255,0.55); }
+
+  .gold-line { width: 40px; height: 3px; background: var(--gold); margin-bottom: 2rem; border-radius: 2px; }
+
+  /* ABOUT */
+  .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: start; margin-top: 2.5rem; }
+  .about-stat { text-align: center; padding: 1.5rem; border: 1px solid var(--light); border-radius: 10px; }
+  .as-num { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 2.5rem; color: var(--gold); line-height: 1; margin-bottom: 0.3rem; }
+  .as-label { font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gray); }
+  .stats-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; margin-top: 2rem; }
+
+  /* SERVICES */
+  .services-list { display: flex; flex-direction: column; gap: 1px; margin-top: 2rem; }
+  .service-row {
+    display: grid; grid-template-columns: 2fr 3fr auto;
+    gap: 1.5rem; padding: 1.2rem 1.5rem; background: var(--off);
+    border-radius: 8px; align-items: center; transition: background 0.2s;
+  }
+  .service-row:hover { background: var(--light); }
+  .sr-name { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 0.82rem; color: var(--black); }
+  .sr-desc { font-size: 0.75rem; color: var(--gray); line-height: 1.5; }
+  .sr-icon { width: 32px; height: 32px; background: var(--gold); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; flex-shrink: 0; }
+
+  /* PACKAGES */
+  .packages-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.2rem; margin-top: 2rem; }
+  .pkg-card { border-radius: 12px; overflow: hidden; border: 1px solid var(--light); }
+  .pkg-card.featured { border-color: var(--gold); box-shadow: 0 8px 30px rgba(212,168,67,0.15); }
+  .pkg-header { padding: 1.5rem; }
+  .pkg-badge { font-size: 0.55rem; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.6); margin-bottom: 0.5rem; font-family: 'Montserrat', sans-serif; }
+  .pkg-name { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1.1rem; color: white; letter-spacing: 0.05em; margin-bottom: 0.3rem; }
+  .pkg-price { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1.5rem; color: white; }
+  .pkg-price span { font-size: 0.7rem; font-weight: 400; opacity: 0.6; }
+  .pkg-body { padding: 1.2rem 1.5rem; background: white; }
+  .pkg-features { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
+  .pkg-features li { font-size: 0.72rem; color: var(--gray); padding-left: 1.1rem; position: relative; line-height: 1.5; }
+  .pkg-features li::before { content: '✦'; position: absolute; left: 0; color: var(--gold); font-size: 0.5rem; top: 0.2rem; }
+  .pkg-best { font-size: 0.55rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold); margin-top: 0.8rem; font-weight: 600; font-family: 'Montserrat', sans-serif; }
+
+  /* TIMELINE */
+  .timeline { display: flex; flex-direction: column; gap: 0; margin-top: 2rem; }
+  .tl-item { display: grid; grid-template-columns: 100px 1fr; gap: 1.5rem; }
+  .tl-left { display: flex; flex-direction: column; align-items: center; }
+  .tl-dot { width: 36px; height: 36px; border-radius: 50%; background: var(--gold); display: flex; align-items: center; justify-content: center; font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 0.65rem; color: var(--black); flex-shrink: 0; }
+  .tl-line { width: 2px; flex: 1; background: var(--light); margin: 0.3rem 0; min-height: 30px; }
+  .tl-item:last-child .tl-line { display: none; }
+  .tl-right { padding-bottom: 2rem; }
+  .tl-phase { font-size: 0.58rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold); font-family: 'Montserrat', sans-serif; font-weight: 600; margin-bottom: 0.3rem; }
+  .tl-title { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 0.95rem; color: var(--black); margin-bottom: 0.4rem; }
+  .tl-desc { font-size: 0.75rem; color: var(--gray); line-height: 1.7; }
+
+  /* WHY US */
+  .why-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; margin-top: 2rem; }
+  .why-card { padding: 1.8rem; border-radius: 10px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.04); }
+  .wc-icon { font-size: 1.5rem; margin-bottom: 0.7rem; display: block; }
+  .wc-title { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 0.85rem; color: var(--white); margin-bottom: 0.5rem; }
+  .wc-desc { font-size: 0.73rem; color: rgba(255,255,255,0.45); line-height: 1.7; }
+
+  /* CONTACT */
+  .contact-split { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; margin-top: 2rem; align-items: start; }
+  .contact-item { display: flex; flex-direction: column; gap: 0.3rem; margin-bottom: 1.5rem; }
+  .ci-label { font-size: 0.58rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold-dk); font-family: 'Montserrat', sans-serif; font-weight: 600; }
+  .ci-value { font-size: 0.88rem; color: var(--black); font-weight: 500; }
+  .cta-box { background: var(--black); border-radius: 12px; padding: 2rem; color: white; }
+  .cta-title { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1.3rem; color: var(--gold); margin-bottom: 0.5rem; }
+  .cta-sub { font-size: 0.78rem; color: rgba(255,255,255,0.5); line-height: 1.7; margin-bottom: 1.5rem; }
+  .cta-btn { display: inline-block; background: var(--gold); color: var(--black); padding: 0.65rem 1.5rem; border-radius: 6px; font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; }
+
+  /* SIGNATURE SECTION */
+  .sig-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; margin-top: 3rem; }
+  .sig-box { border-top: 2px solid var(--light); padding-top: 1rem; }
+  .sig-label { font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gray); margin-bottom: 2rem; }
+  .sig-line { border-bottom: 1px solid var(--light); margin-bottom: 0.5rem; height: 40px; }
+  .sig-name { font-size: 0.7rem; color: var(--gray); }
+
+  /* PRINT */
+  @media print {
+    .toolbar, .edit-hint { display: none !important; }
+    .proposal { padding-top: 0; }
+    .page, .cover { page-break-after: always; }
+    body.editing [contenteditable] { border-bottom: none !important; background: transparent !important; }
+  }
+
+  @media(max-width:650px) {
+    .cover, .page { padding: 2.5rem; }
+    .about-grid, .packages-grid, .why-grid, .contact-split, .sig-grid { grid-template-columns: 1fr; }
+    .service-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOOLBAR -->
+<div class="toolbar">
+  <div class="toolbar-left">
+    <div class="toolbar-brand">
+      <svg width="100" height="20" viewBox="0 0 120 20" xmlns="http://www.w3.org/2000/svg" style="display: block;">
+        <g transform="translate(0, 0) scale(0.35)">
+          <polygon points="20,6 28,0 36,6 34,6 28,2 22,6" fill="#D4A843"/>
+          <polygon points="20,12 28,6 36,12 34,12 28,8 22,12" fill="#D4A843"/>
+        </g>
+        <text x="14" y="15" font-family="Montserrat, sans-serif" font-weight="900" font-size="12" letter-spacing="1.5" fill="#D4A843">ENH</text>
+        <text x="48" y="15" font-family="Montserrat, sans-serif" font-weight="900" font-size="12" letter-spacing="1.5" fill="#D4A843">NCE</text>
+      </svg>
+    </div>
+    <div class="toolbar-status" id="editStatus">View Mode</div>
+  </div>
+  <div class="toolbar-right">
+    <button class="btn btn-edit" id="editBtn" onclick="toggleEdit()">✏️ Enable Editing</button>
+    <button class="btn btn-print" onclick="window.print()">🖨️ Print / Save PDF</button>
+  </div>
+</div>
+
+<div class="edit-hint" id="editHint">✏️ Click any text to edit it</div>
+
+<div class="proposal">
+
+  <!-- COVER -->
+  <div class="cover">
+    <div class="cover-logo">
+      <svg width="200" height="80" viewBox="0 0 220 80" xmlns="http://www.w3.org/2000/svg" style="margin-bottom: 1rem;">
+        <!-- Double chevron mark -->
+        <g transform="translate(0, 5)">
+          <polygon points="38,12 50,0 62,12 58,12 50,5 42,12" fill="#D4A843"/>
+          <polygon points="38,22 50,10 62,22 58,22 50,15 42,22" fill="#D4A843"/>
+        </g>
+        <!-- ENH text -->
+        <text x="0" y="58" font-family="Montserrat, sans-serif" font-weight="900" font-size="28" letter-spacing="2" fill="#FFFFFF">ENH</text>
+        <!-- gap for chevron -->
+        <text x="88" y="58" font-family="Montserrat, sans-serif" font-weight="900" font-size="28" letter-spacing="2" fill="#FFFFFF">NCE</text>
+        <!-- Marketing Agency -->
+        <text x="0" y="74" font-family="Montserrat, sans-serif" font-weight="500" font-size="10" letter-spacing="3" fill="#D4A843">Marketing Agency</text>
+      </svg>
+    </div>
+    <div class="cover-main">
+      <div class="cover-label">Marketing Proposal</div>
+      <div class="cover-title">Prepared<br>for <span contenteditable="false">[Client Name]</span></div>
+      <div class="cover-subtitle" contenteditable="false">Your brand, elevated — strategically and creatively.</div>
+      <div class="cover-meta">
+        <div class="cm-item">
+          <div class="cm-label">Prepared by</div>
+          <div class="cm-value" contenteditable="false">Farah — Enhance Marketing Agency</div>
+        </div>
+        <div class="cm-item">
+          <div class="cm-label">Date</div>
+          <div class="cm-value" contenteditable="false" id="propDate"></div>
+        </div>
+        <div class="cm-item">
+          <div class="cm-label">Valid for</div>
+          <div class="cm-value" contenteditable="false">30 Days</div>
+        </div>
+      </div>
+    </div>
+    <div class="cover-footer">
+      <div class="cf-prepared" contenteditable="false"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="c88da6a0a9a6abadbba5a5a9afac88afa5a9a1a4e6aba7a5">[email&#160;protected]</a> · @Enhance.MKTG · +01559350566</div>
+      <div class="cf-page">01</div>
+    </div>
+  </div>
+
+  <!-- ABOUT -->
+  <div class="page warm">
+    <div class="page-num">02</div>
+    <div class="section-eyebrow">About Us</div>
+    <div class="section-heading">Who Is <span>Enhance?</span></div>
+    <div class="gold-line"></div>
+    <div class="section-body" contenteditable="false">Enhance Marketing Agency was founded with one mission: to help businesses show up powerfully in a crowded digital world. We combine creative content, data-driven strategy, and genuine passion to deliver marketing that doesn't just look good — it gets results.<br><br>Since 2024, we've been crafting tailored marketing experiences for businesses ready to grow. We don't believe in one-size-fits-all. Every brand has its own flavor — and we know exactly how to bring it out.</div>
+    <div class="stats-row">
+      <div class="about-stat">
+        <div class="as-num" contenteditable="false">2024</div>
+        <div class="as-label">Founded</div>
+      </div>
+      <div class="about-stat">
+        <div class="as-num" contenteditable="false">9+</div>
+        <div class="as-label">Services Offered</div>
+      </div>
+      <div class="about-stat">
+        <div class="as-num" contenteditable="false">100%</div>
+        <div class="as-label">Tailored Strategy</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SERVICES -->
+  <div class="page">
+    <div class="page-num">03</div>
+    <div class="section-eyebrow">What We Offer</div>
+    <div class="section-heading">Our <span>Services</span></div>
+    <div class="gold-line"></div>
+    <div class="section-body" contenteditable="false">Everything your brand needs to grow — under one roof. Each service is tailored to your specific goals, audience, and industry.</div>
+    <div class="services-list">
+      <div class="service-row">
+        <div class="sr-name" contenteditable="false">Content Creation</div>
+        <div class="sr-desc" contenteditable="false">Photo shoots, reel sessions, and creative assets that tell your brand story and stop the scroll.</div>
+        <div class="sr-icon">📸</div>
+      </div>
+      <div class="service-row">
+        <div class="sr-name" contenteditable="false">Social Media Management</div>
+        <div class="sr-desc" contenteditable="false">Full account management including calendar, posting, captions, engagement, and DM handling.</div>
+        <div class="sr-icon">📱</div>
+      </div>
+      <div class="service-row">
+        <div class="sr-name" contenteditable="false">Reel Creation</div>
+        <div class="sr-desc" contenteditable="false">Strategy, filming, editing, and publishing of high-performing video content for Instagram & TikTok.</div>
+        <div class="sr-icon">🎬</div>
+      </div>
+      <div class="service-row">
+        <div class="sr-name" contenteditable="false">Graphic Design</div>
+        <div class="sr-desc" contenteditable="false">On-brand visual assets — posts, stories, covers, and more — designed to convert.</div>
+        <div class="sr-icon">🎨</div>
+      </div>
+      <div class="service-row">
+        <div class="sr-name" contenteditable="false">Media Buying</div>
+        <div class="sr-desc" contenteditable="false">Targeted paid campaigns on Facebook, Instagram, and TikTok to maximize your reach and ROI.</div>
+        <div class="sr-icon">📣</div>
+      </div>
+      <div class="service-row">
+        <div class="sr-name" contenteditable="false">SEO & Analytics</div>
+        <div class="sr-desc" contenteditable="false">Search optimization and monthly performance reporting to track growth and refine strategy.</div>
+        <div class="sr-icon">📊</div>
+      </div>
+      <div class="service-row">
+        <div class="sr-name" contenteditable="false">Branding & Visual Identity</div>
+        <div class="sr-desc" contenteditable="false">Logo, color palette, brand personality — everything needed to build a memorable brand from scratch.</div>
+        <div class="sr-icon">✨</div>
+      </div>
+      <div class="service-row">
+        <div class="sr-name" contenteditable="false">UGC Strategy</div>
+        <div class="sr-desc" contenteditable="false">Systems to collect, manage, and showcase authentic customer-generated content for your brand.</div>
+        <div class="sr-icon">🤳</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PACKAGES -->
+  <div class="page warm">
+    <div class="page-num">04</div>
+    <div class="section-eyebrow">Pricing</div>
+    <div class="section-heading">Our <span>Packages</span></div>
+    <div class="gold-line"></div>
+    <div class="section-body" contenteditable="false">Three tiers designed to match where your business is right now — and where it's going. All packages are monthly and fully customizable.</div>
+    <div class="packages-grid">
+
+      <!-- Starter -->
+      <div class="pkg-card">
+        <div class="pkg-header" style="background:var(--charcoal)">
+          <div class="pkg-badge">Entry Level</div>
+          <div class="pkg-name" contenteditable="false">Enhance CORE</div>
+          <div class="pkg-price" contenteditable="false">7,000 <span>LE / month</span></div>
+        </div>
+        <div class="pkg-body">
+          <ul class="pkg-features">
+            <li contenteditable="false">Branding (visual identity, logo, palette)</li>
+            <li contenteditable="false">Social media management — FB, IG & TikTok</li>
+            <li contenteditable="false">1 photo shoot per month</li>
+            <li contenteditable="false">2 reel sessions per month</li>
+            <li contenteditable="false">Monthly content calendar</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Sizzle — featured -->
+      <div class="pkg-card featured">
+        <div class="pkg-header" style="background:var(--gold-dk)">
+          <div class="pkg-badge">⭐ Most Popular</div>
+          <div class="pkg-name" contenteditable="false">Enhance PLUS</div>
+          <div class="pkg-price" contenteditable="false">9,000 <span>LE / month</span></div>
+        </div>
+        <div class="pkg-body">
+          <ul class="pkg-features">
+            <li contenteditable="false">Marketing strategy development</li>
+            <li contenteditable="false">Content strategy — reels, stories & offers</li>
+            <li contenteditable="false">2 photo shoots per month</li>
+            <li contenteditable="false">3 reel sessions per month</li>
+            <li contenteditable="false">Full publishing, captions & DM handling</li>
+            <li contenteditable="false">UGC collection strategy</li>
+            <li contenteditable="false">QR code design for menus/offers</li>
+          </ul>
+          <div class="pkg-best">★ Best value for growing brands</div>
+        </div>
+      </div>
+
+      <!-- Signature -->
+      <div class="pkg-card">
+        <div class="pkg-header" style="background:var(--black)">
+          <div class="pkg-badge">Premium</div>
+          <div class="pkg-name" contenteditable="false">Enhance PRO</div>
+          <div class="pkg-price" contenteditable="false">11,000 <span>LE / month</span></div>
+        </div>
+        <div class="pkg-body">
+          <ul class="pkg-features">
+            <li contenteditable="false">Full marketing strategy & campaign launch</li>
+            <li contenteditable="false">3 photo shoots per month</li>
+            <li contenteditable="false">4 reel sessions per month</li>
+            <li contenteditable="false">Advanced performance tracking & reporting</li>
+            <li contenteditable="false">Loyalty & offer funnel design</li>
+            <li contenteditable="false">Full 30-day content calendar + assets</li>
+            <li contenteditable="false">Influencer / creator collaboration</li>
+            <li contenteditable="false">UGC collection system</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Custom note -->
+    <div style="margin-top:1.5rem;padding:1.2rem 1.5rem;background:rgba(212,168,67,0.08);border-radius:8px;border-left:3px solid var(--gold)">
+      <div style="font-size:0.72rem;color:var(--gray);line-height:1.7" contenteditable="false">💡 <strong style="color:var(--black)">Custom package available.</strong> If none of the above packages perfectly match your needs, we'll build one that does. Reach out and let's talk.</div>
+    </div>
+  </div>
+
+  <!-- TIMELINE -->
+  <div class="page">
+    <div class="page-num">05</div>
+    <div class="section-eyebrow">How We Work</div>
+    <div class="section-heading">Our <span>Timeline</span></div>
+    <div class="gold-line"></div>
+    <div class="section-body" contenteditable="false">From first conversation to full execution — here's exactly how working with Enhance looks, step by step.</div>
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-left"><div class="tl-dot">01</div><div class="tl-line"></div></div>
+        <div class="tl-right">
+          <div class="tl-phase">Week 1</div>
+          <div class="tl-title" contenteditable="false">Kickoff Meeting & Discovery</div>
+          <div class="tl-desc" contenteditable="false">We meet to understand your business, goals, audience, and current presence. We ask the right questions — then we listen. This session shapes everything that follows.</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-left"><div class="tl-dot">02</div><div class="tl-line"></div></div>
+        <div class="tl-right">
+          <div class="tl-phase">Week 1–2</div>
+          <div class="tl-title" contenteditable="false">Strategy Session</div>
+          <div class="tl-desc" contenteditable="false">We build your custom marketing strategy — content pillars, platform plan, content calendar, and campaign ideas. You approve everything before we move forward.</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-left"><div class="tl-dot">03</div><div class="tl-line"></div></div>
+        <div class="tl-right">
+          <div class="tl-phase">Week 2–3</div>
+          <div class="tl-title" contenteditable="false">Lights, Camera, Action</div>
+          <div class="tl-desc" contenteditable="false">Content creation begins — photo shoots, reel sessions, graphic design, and copywriting. We produce everything your brand needs to show up consistently and powerfully.</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-left"><div class="tl-dot">04</div><div class="tl-line"></div></div>
+        <div class="tl-right">
+          <div class="tl-phase">Week 3–4</div>
+          <div class="tl-title" contenteditable="false">Launch & Publish</div>
+          <div class="tl-desc" contenteditable="false">Content goes live across your platforms. We handle publishing, scheduling, captions, hashtags, and community engagement on your behalf.</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-left"><div class="tl-dot">05</div><div class="tl-line"></div></div>
+        <div class="tl-right">
+          <div class="tl-phase">Monthly</div>
+          <div class="tl-title" contenteditable="false">Results & Growth Mode</div>
+          <div class="tl-desc" contenteditable="false">Every month we review performance, share a detailed report, and refine the strategy based on what's working. We're always optimizing — never coasting.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WHY US -->
+  <div class="page dark">
+    <div class="page-num">06</div>
+    <div class="section-eyebrow">Why Enhance</div>
+    <div class="section-heading">What Makes Us <span>Different</span></div>
+    <div class="gold-line"></div>
+    <div class="section-body" contenteditable="false">We don't just offer services — we craft tailored experiences. No recycled templates. No one-size-fits-all. Just original strategy and content that speaks your brand's language.</div>
+    <div class="why-grid">
+      <div class="why-card">
+        <span class="wc-icon">🎯</span>
+        <div class="wc-title" contenteditable="false">Tailored, Not Templated</div>
+        <div class="wc-desc" contenteditable="false">Every strategy we build is created specifically for your brand — your audience, your goals, your tone. Nothing is copy-pasted from another client.</div>
+      </div>
+      <div class="why-card">
+        <span class="wc-icon">📈</span>
+        <div class="wc-title" contenteditable="false">Results-Driven Approach</div>
+        <div class="wc-desc" contenteditable="false">We track everything. Monthly reports, data-driven decisions, and constant optimization mean your marketing keeps getting better.</div>
+      </div>
+      <div class="why-card">
+        <span class="wc-icon">🤝</span>
+        <div class="wc-title" contenteditable="false">A True Partner</div>
+        <div class="wc-desc" contenteditable="false">We don't disappear after the contract is signed. We're with you every step — responsive, collaborative, and genuinely invested in your growth.</div>
+      </div>
+      <div class="why-card">
+        <span class="wc-icon">✨</span>
+        <div class="wc-title" contenteditable="false">End-to-End Execution</div>
+        <div class="wc-desc" contenteditable="false">Strategy, content, design, management, reporting — all under one roof. No need to juggle multiple vendors. We handle it all.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECRET BONUS PAGE -->
+  <div class="page" style="background: linear-gradient(135deg, #0a0a0a 0%, #1a1200 100%); position: relative; overflow: hidden;">
+    <div style="position: absolute; inset: 0; background-image: radial-gradient(circle, rgba(212,168,67,0.05) 1px, transparent 1px); background-size: 30px 30px;"></div>
+    <div class="page-num" style="color: rgba(212,168,67,0.2);">★</div>
+    
+    <div style="position: relative; z-index: 2; text-align: center; padding: 3rem 0;">
+      <div style="font-size: 0.6rem; letter-spacing: 0.35em; text-transform: uppercase; color: var(--gold); margin-bottom: 1rem; font-family: 'Montserrat', sans-serif; font-weight: 600;">✦ Secret Bonus ✦</div>
+      
+      <div style="font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: clamp(2rem, 5vw, 3.5rem); color: white; line-height: 1.1; margin-bottom: 1rem;">
+        You Found The<br><span style="color: var(--gold);">Hidden Page</span>
+      </div>
+
+      <div style="font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.1rem; color: rgba(255,255,255,0.5); margin-bottom: 3rem; max-width: 520px; margin-left: auto; margin-right: auto;">
+        Most people skim proposals. You actually read ours. That tells us everything we need to know about you.
+      </div>
+
+      <div style="background: rgba(212,168,67,0.08); border: 2px solid var(--gold); border-radius: 16px; padding: 2.5rem; max-width: 600px; margin: 0 auto 2rem; position: relative;">
+        <div style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--gold); color: var(--black); padding: 0.3rem 1rem; border-radius: 100px; font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 0.62rem; letter-spacing: 0.15em;">BONUS OFFER</div>
+        
+        <div style="font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1.8rem; color: var(--gold); margin-bottom: 0.8rem; margin-top: 0.5rem;">
+          15% OFF
+        </div>
+        
+        <div style="font-size: 0.85rem; color: rgba(255,255,255,0.7); line-height: 1.8; margin-bottom: 1.5rem;">
+          Because you made it this far, here's your exclusive discount on <strong style="color: white;">any package</strong> — valid only if you mention this page when you reach out.
+        </div>
+
+        <div style="font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold); background: rgba(212,168,67,0.1); padding: 0.6rem 1.2rem; border-radius: 6px; display: inline-block;">
+          Code: <span style="color: white;">IREADTHEWHOLETHING</span>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; max-width: 600px; margin: 0 auto;">
+        <div style="background: rgba(255,255,255,0.05); border-radius: 12px; padding: 1.5rem; border: 1px solid rgba(255,255,255,0.08);">
+          <div style="font-size: 1.8rem; margin-bottom: 0.5rem;">🎁</div>
+          <div style="font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 0.75rem; color: white; margin-bottom: 0.3rem;">Free Brand Audit</div>
+          <div style="font-size: 0.68rem; color: rgba(255,255,255,0.4); line-height: 1.5;">We'll review your current presence — free</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.05); border-radius: 12px; padding: 1.5rem; border: 1px solid rgba(255,255,255,0.08);">
+          <div style="font-size: 1.8rem; margin-bottom: 0.5rem;">⚡</div>
+          <div style="font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 0.75rem; color: white; margin-bottom: 0.3rem;">Priority Start</div>
+          <div style="font-size: 0.68rem; color: rgba(255,255,255,0.4); line-height: 1.5;">Jump the queue — we start this week</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.05); border-radius: 12px; padding: 1.5rem; border: 1px solid rgba(255,255,255,0.08);">
+          <div style="font-size: 1.8rem; margin-bottom: 0.5rem;">✨</div>
+          <div style="font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 0.75rem; color: white; margin-bottom: 0.3rem;">Bonus Content</div>
+          <div style="font-size: 0.68rem; color: rgba(255,255,255,0.4); line-height: 1.5;">Extra reel session in month 1</div>
+        </div>
+      </div>
+
+      <div style="margin-top: 3rem; font-size: 0.68rem; color: rgba(255,255,255,0.3); line-height: 1.7; font-style: italic;">
+        This page doesn't appear in the print version — it's just for you.<br>
+        We respect people who pay attention to details. Let's work together.
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTACT -->
+  <div class="page warm">
+    <div class="page-num">08</div>
+    <div class="section-eyebrow">Let's Work Together</div>
+    <div class="section-heading">Get In <span>Touch</span></div>
+    <div class="gold-line"></div>
+    <div class="contact-split">
+      <div>
+        <div class="contact-item">
+          <div class="ci-label">Email</div>
+          <div class="ci-value" contenteditable="false"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="25604b4d444b4640564848444241654248444c490b464a48">[email&#160;protected]</a></div>
+        </div>
+        <div class="contact-item">
+          <div class="ci-label">Phone</div>
+          <div class="ci-value" contenteditable="false">+01559350566 · +01224393505</div>
+        </div>
+        <div class="contact-item">
+          <div class="ci-label">Social Media</div>
+          <div class="ci-value" contenteditable="false">@Enhance.MKTG</div>
+        </div>
+        <div class="contact-item">
+          <div class="ci-label">Instagram</div>
+          <div class="ci-value" contenteditable="false">instagram.com/Enhance.MKTG</div>
+        </div>
+      </div>
+      <div class="cta-box">
+        <div class="cta-title" contenteditable="false">Ready to Enhance Your Brand?</div>
+        <div class="cta-sub" contenteditable="false">This proposal is valid for 30 days from the date above. To move forward, simply reply to this proposal or reach out directly — and we'll get started right away.</div>
+        <div class="cta-btn">Let's Get Started →</div>
+      </div>
+    </div>
+
+    <!-- Signature -->
+    <div class="sig-grid">
+      <div class="sig-box">
+        <div class="sig-label">Client Signature & Date</div>
+        <div class="sig-line"></div>
+        <div class="sig-name" contenteditable="false">[Client Name] · [Date]</div>
+      </div>
+      <div class="sig-box">
+        <div class="sig-label">Enhance — Authorized by</div>
+        <div class="sig-line"></div>
+        <div class="sig-name" contenteditable="false">Farah · Enhance Marketing Agency</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end proposal -->
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  // Set today's date
+  const d = new Date();
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('propDate').textContent = d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
+
+  let editing = false;
+
+  function toggleEdit() {
+    editing = !editing;
+    const btn = document.getElementById('editBtn');
+    const status = document.getElementById('editStatus');
+    const hint = document.getElementById('editHint');
+    const fields = document.querySelectorAll('[contenteditable]');
+
+    if (editing) {
+      document.body.classList.add('editing');
+      fields.forEach(f => f.setAttribute('contenteditable', 'true'));
+      btn.textContent = '✅ Done Editing';
+      btn.classList.add('active');
+      status.textContent = 'Edit Mode — Click any text to change it';
+      h
